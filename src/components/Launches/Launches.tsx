@@ -11,7 +11,9 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Unstable_Grid2';
 import TextField from '@mui/material/TextField';
 import Masonry from '@mui/lab/Masonry';
-import { ChangeEvent, Key, ReactChild, ReactFragment, ReactPortal, useState } from 'react';
+import Pagination from '@mui/lab/Pagination';
+import usePagination from '../../hooks/Pagination';
+import { ChangeEvent, Key, ReactChild, ReactFragment, ReactPortal, SetStateAction, useState } from 'react';
 
 const Launches = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,29 +23,51 @@ const Launches = () => {
     launch?.rocket?.rocket_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  let [page, setPage] = useState(1);
+  const PER_PAGE = 24;
+
+  const count = Math.ceil(filteredData?.length || 0 / PER_PAGE);
+  const _DATA = usePagination(filteredData, PER_PAGE);
+
+  const handleChange = (e: any, p: SetStateAction<number>) => {
+    setPage(p);
+    _DATA.jump(p);
+  };
+
   const handleOnSearch = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setSearchTerm(e.target.value);
   }
 
   return (
-    <Box sx={{ backgroundColor: '#dfdfdf', p: 4 }}>
+    <><Box sx={{ backgroundColor: '#dfdfdf', p: 4 }}>
       <TextField
-          label="Search by Mission or Rocket Name..."
-          variant='filled'
-          type='search'
-          sx={{
-            mb: 2,
-            background: 'white',
-            minWidth: 320
-          }}
-          onChange={e => handleOnSearch(e)}
-      />
+        label="Search by Mission or Rocket Name..."
+        variant='filled'
+        type='search'
+        sx={{
+          mb: 2,
+          background: 'white',
+          minWidth: 320
+        }}
+        onChange={e => handleOnSearch(e)} />
+
+      <Pagination
+        count={count}
+        size="large"
+        page={page}
+        variant="outlined"
+        shape="rounded"
+        onChange={handleChange}
+        sx={{
+          mb: 2
+        }} />
+
       <Box>
         <Masonry columns={4} spacing={2}>
           {isLoading && <p>Loading...</p>}
-          {filteredData && filteredData.map((launch, index) => (
+          {_DATA.currentData()?.map((launch: any, index: number) => (
             <Card sx={{ minWidth: 240 }} key={index} variant='elevation'>
-              <header style={{ borderBottom: '1px dotted #cecece', padding: 16, marginBottom: 16, height: 100}}>
+              <header style={{ borderBottom: '1px dotted #cecece', padding: 16, marginBottom: 16, height: 100 }}>
                 <Typography variant="h5" gutterBottom>
                   {launch?.mission_name}
                 </Typography>
@@ -64,11 +88,11 @@ const Launches = () => {
                 </Box>
               </section>
 
-                <Box px={2}>
-                  <Typography variant="subtitle2" gutterBottom>
-                    <a style={{ fontSize: 'smaller' }} href={launch?.links?.wikipedia || ''} target='_blank'>Wikipedia Link</a>
-                  </Typography>
-                </Box>
+              <Box px={2}>
+                <Typography variant="subtitle2" gutterBottom>
+                  <a style={{ fontSize: 'smaller' }} href={launch?.links?.wikipedia || ''} target='_blank'>Wikipedia Link</a>
+                </Typography>
+              </Box>
 
               {launch?.rocket?.rocket_name && <Box px={2}>
                 <Typography variant="subtitle2" gutterBottom>
@@ -86,7 +110,7 @@ const Launches = () => {
                     <Typography variant="subtitle2" gutterBottom>Ships:</Typography>
                   </header>
 
-                  {launch?.ships?.map((ship, idx) => {
+                  {launch?.ships?.map((ship: any, idx: number) => {
                     return (
                       <ul style={{
                         listStyle: 'none',
@@ -95,7 +119,7 @@ const Launches = () => {
                       }}>
                         <li style={{ paddingBottom: 8 }}>{ship?.home_port}</li>
                         <li style={{ paddingBottom: 8 }}><strong>{ship?.name}</strong></li>
-                        {ship?.image && <li>
+                        {ship?.image && <li style={{ marginBottom: 8 }}>
                           <img
                             src={ship?.image}
                             alt={ship?.name || ''}
@@ -104,21 +128,31 @@ const Launches = () => {
                               borderBottomRightRadius: 4,
                               display: 'block',
                               width: '100%',
-                            }}
-                          />
+                            }} />
                         </li>}
                       </ul>
                     );
                   })}
                 </Box>
-                : null
-              }
+                : null}
             </Card>
           ))}
         </Masonry>
       </Box>
     </Box>
-  );
+    
+    <Pagination
+      count={count}
+      size="large"
+      page={page}
+      variant="outlined"
+      shape="rounded"
+      onChange={handleChange}
+      sx={{
+        mb: 2
+      }}
+    />
+  </>);
 };
 
 export default Launches;
