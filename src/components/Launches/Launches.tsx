@@ -16,7 +16,10 @@ import { ChangeEvent, Key, ReactChild, ReactFragment, ReactPortal, useState } fr
 const Launches = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const { data, isLoading } = useLaunchesQuery();
-  const filteredData = data?.launchesPast?.filter(launch => launch?.mission_name?.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredData = data?.launchesPast?.filter(launch => 
+    launch?.mission_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    launch?.rocket?.rocket_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleOnSearch = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setSearchTerm(e.target.value);
