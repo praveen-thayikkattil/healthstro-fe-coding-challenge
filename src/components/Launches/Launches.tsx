@@ -119,7 +119,7 @@ const Launches = () => {
                       }}>
                         <li style={{ paddingBottom: 8 }}>{ship?.home_port}</li>
                         <li style={{ paddingBottom: 8 }}><strong>{ship?.name}</strong></li>
-                        {ship?.image && <li style={{ marginBottom: 8 }}>
+                        {ship?.image && <li style={{ marginBottom: 24 }}>
                           <img
                             src={ship?.image}
                             alt={ship?.name || ''}
@@ -149,7 +149,7 @@ const Launches = () => {
       shape="rounded"
       onChange={handleChange}
       sx={{
-        mb: 2
+        my: 2
       }}
     />
   </>);
